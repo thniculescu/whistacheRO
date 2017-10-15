@@ -32,12 +32,29 @@ Builder.load_string('''
             Label:
                 id: _id_player_up
                 text: 'nicualwayswins'
-                font_size: 40
                 size_hint_x: 2
             Button:
                 text: 'Undo'
                 font_size: 30
                 size_hint_x: 1
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 1
+            Label:
+                text: 'Game of:'
+                size_hint_x: 2
+            Label:
+                id: _gameof_
+                text: '-'
+                size_hint_x: 2
+            Label:
+                text: 'Bids untill now:'
+                size_hint_x: 3
+            Label:
+                id: _buntinow_
+                text: '-'
+                size_hint_x: 1
+
         GridLayout:
             cols: 3
             size_hint_y: 10
