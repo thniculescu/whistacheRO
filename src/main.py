@@ -336,7 +336,7 @@ class Pagina(PageLayout):
 	def getNames(self):
 		global tin
 
-		droptop = DropDown(height = 44, width = 10)
+		droptop = DropDown(height = 80, width = 10)
 		gigi = BoxLayout()
 		gigi.orientation = 'vertical'
 		popup = Popup(title='New Game',
@@ -367,7 +367,6 @@ class Pagina(PageLayout):
 		#b1.on_press = self.scotpopup(popup, dropbut)
 		b2 =  Label(text = 'girl from ipanema')
 		gigi.add_widget(b1)
-		gigi.add_widget(b2)
 
 
 		for i in range(6):
