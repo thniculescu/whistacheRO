@@ -31,6 +31,7 @@ Builder.load_string('''
 			size_hint_y: 1
 			Label:
 				id: _id_player_up
+				font_size: 20
 				text: 'nicualwayswins'
 				size_hint_x: 2
 			Button:
@@ -61,29 +62,38 @@ Builder.load_string('''
 			size_hint_y: 10
 			Button:
 				text:'0'
+				font_size: 80
 				id: _b0_
 			Button:
+				font_size: 80
 				text:'1'
 				id: _b1_
 			Button:
+				font_size: 80
 				text:'2'
 				id: _b2_
 			Button:
+				font_size: 80
 				text:'3'
 				id: _b3_
 			Button:
+				font_size: 80
 				text:'4'
 				id: _b4_
 			Button:
+				font_size: 80
 				text:'5'
 				id: _b5_
 			Button:
+				font_size: 80
 				text:'6'
 				id: _b6_
 			Button:
+				font_size: 80
 				text:'7'
 				id: _b7_
 			Button:
+				font_size: 80
 				text:'8'
 				id: _b8_
 
@@ -174,6 +184,9 @@ tcur = 0
 gameof = []
 playerof = []
 totolit = 0
+totomade = 0
+
+grey = 0
 
 cbutoane = [0, 0, 0, 0, 0, 0]
 ctin = [0, 0, 0, 0, 0, 0]
@@ -183,6 +196,7 @@ clicitate = [-1, -1, -1, -1, -1, -1]
 cture = 0
 ctcur = 0
 ctotolit = 0
+ctotomade = 0
 
 
 class Tinput(TextInput):
@@ -223,6 +237,12 @@ class Pagina(PageLayout):
 			self.playerup.text = winners + ding
 			return
 		else:
+			if(tcur % (self.numPlayer * 2) == 0):
+				for i in range(9):
+					self.bID[i].disabled = False
+				for i in range(int(gameof[tcur / (self.numPlayer * 2)][0]) + 1, 9):
+					self.bID[i].disabled = True
+					
 			self.ids._buntinow_.text = str(totolit)
 			self.ids._gameof_.text = str(gameof[tcur / (self.numPlayer * 2)])
 			prefi = tcur / self.numPlayer
@@ -232,22 +252,23 @@ class Pagina(PageLayout):
 				self.playerup.text = self.playerNames[(tcur % self.numPlayer + (tcur / (2 * self.numPlayer))) % self.numPlayer] + ' made'
 
 	def update(self):
-		global scor, streak, cscor, cstreak, ctotolit, totolit, licitate, clicitate, ctcur, tcur
+		global scor, streak, cscor, cstreak, ctotolit, totolit, licitate, clicitate, ctcur, tcur, totomade
 		for i in range(self.numPlayer):
 			self.sID[i].text = str(scor[i])
 			self.trkID[i].text = str(streak[i])
 		
 	def savestate(self):
-		global scor, streak, cscor, cstreak, ctotolit, totolit, licitate, clicitate, ctcur, tcur
+		global scor, streak, cscor, cstreak, ctotolit, totolit, licitate, clicitate, ctcur, tcur, totomade
 		for i in range(self.numPlayer):
 			cscor[i] = scor[i]
 			cstreak[i] = streak[i]
 			clicitate[i] = licitate[i]	
 		ctcur = tcur
 		ctotolit = totolit
+		ctotomade = totomade
 
 	def onundo(self):
-		global scor, streak, cscor, cstreak, ctotolit, totolit, licitate, clicitate, ctcur, tcur
+		global scor, streak, cscor, cstreak, ctotolit, totolit, licitate, clicitate, ctcur, tcur, totomade
 		for i in range(self.numPlayer):
 			scor[i] = cscor[i]
 			streak[i] = cstreak[i]
@@ -256,23 +277,40 @@ class Pagina(PageLayout):
 		tcur = ctcur
 		
 		totolit = ctotolit
+		totomade = ctotomade
 		#print 'UNDO BA'
 		self.update()
 		self.schimbaAfis()
 			
 	def lici(self, nrb):
-		global licitate, scor, streak, totolit, tcur
+		global licitate, scor, streak, totolit, tcur, totomade, gameof, grey
 		curpl = (tcur % self.numPlayer + (tcur / (2 * self.numPlayer))) % self.numPlayer
 		rund = tcur % (self.numPlayer * 2)
+		joc = int(gameof[tcur / (self.numPlayer * 2)][0])
 		self.savestate()
 		if rund < self.numPlayer:
-			#if(curpl == self.numPlayer - 2):
-			#if(curpl == self.numPlayer - 1):
+			totomade = 0
+			joc = int(gameof[tcur / (self.numPlayer * 2)][0])
+			
+			if tcur % self.numPlayer == self.numPlayer - 1:
+				if totolit <= joc:
+					self.bID[joc - totolit].disabled = False
 
 			licitate[curpl] = nrb
 			totolit += nrb
 			
+			if tcur % self.numPlayer == self.numPlayer - 2:
+				if totolit <= joc:
+					self.bID[joc - totolit].disabled = True	
+					
 		else:
+			
+			if tcur % self.numPlayer == self.numPlayer - 1:
+				if totomade <= joc:
+					self.bID[joc - totomade].background_color = grey
+					self.bID[joc - totomade].color = (1, 1, 1, 1)
+				
+			totomade += nrb
 			totolit = 0
 			if licitate[curpl] == nrb:
 				scor[curpl] += 5 + nrb
@@ -288,9 +326,15 @@ class Pagina(PageLayout):
 			if abs(streak[curpl]) == 5:
 				scor[curpl] += streak[curpl] * 2
 				streak[curpl] = 0
-
-		
-		
+			
+			if tcur % self.numPlayer == self.numPlayer - 2:
+				if totomade <= joc:
+					grey = self.bID[joc - totomade].background_color
+					self.bID[joc - totomade].background_color = (0, 255, 0, 255)
+					self.bID[joc - totomade].color = (0, 0, 0, 1)
+			
+			
+			
 		self.update()
 		tcur += 1
 		self.schimbaAfis()
@@ -310,11 +354,11 @@ class Pagina(PageLayout):
 			for i in range(self.numPlayer):
 				gameof.append('1.' + str(i))
 			for i in range(2, 8):
-				gameof.append(i)
+				gameof.append(str(i))
 			for i in range(self.numPlayer):
 				gameof.append('8.' + str(i))
 			for i in range(-7, -1):
-				gameof.append(-i)
+				gameof.append(str(-i))
 			for i in range(self.numPlayer):
 				gameof.append('1.' + str(i))
 
@@ -344,9 +388,9 @@ class Pagina(PageLayout):
 					  auto_dismiss=False)
 
 
-		dropbut = Button(text = 'Number of players:', size_hint=(1, 1))
+		dropbut = Button(text = 'Number of players:', font_size = 20, size_hint=(1, 1))
 		for i in range(2, 6):
-			butoane[i] = Button(text = '%s Players' % (i + 1), size_hint_y=None, height = 50)
+			butoane[i] = Button(text = '%s Players' % (i + 1), size_hint_y=None, height_hint = 1, font_size = 20)
 			butoane[i].bind(on_release=lambda btn: droptop.select(btn.text))
 			droptop.add_widget(butoane[i])
 
@@ -359,7 +403,7 @@ class Pagina(PageLayout):
 
 
 
-		b1 = Button(text='OK')
+		b1 = Button(text='OK', font_size = 40)
 		#b1.on_press=popup.dismiss
 		b1.bind(on_release = lambda instance: self.scotpopup(popup, dropbut, tin))
 		#b1.bind(on_press = lambda instance: popup.dismiss())
@@ -370,7 +414,7 @@ class Pagina(PageLayout):
 
 
 		for i in range(6):
-			tin[i] = Tinput(text = '', hint_text = 'Player %s' % (i + 1), multiline = False)
+			tin[i] = Tinput(text = '', hint_text = 'Player %s' % (i + 1), multiline = False, font_size = 40)
 			#tin[i].inend(tin[i], self, i)
 			tinref = [tin]
 			#j = i
@@ -401,16 +445,16 @@ class ScreenManagerApp(App):
 	def on_start(self):
 		self.principala.getNames()
 
-		self.principala.bID[0].on_press = lambda: self.principala.lici(0)
-		self.principala.bID[1].on_press = lambda: self.principala.lici(1)
-		self.principala.bID[2].on_press = lambda: self.principala.lici(2)
-		self.principala.bID[3].on_press = lambda: self.principala.lici(3)
-		self.principala.bID[4].on_press = lambda: self.principala.lici(4)
-		self.principala.bID[5].on_press = lambda: self.principala.lici(5)
-		self.principala.bID[6].on_press = lambda: self.principala.lici(6)
-		self.principala.bID[7].on_press = lambda: self.principala.lici(7)
-		self.principala.bID[8].on_press = lambda: self.principala.lici(8)
-		self.principala.ids._undo_.on_press = lambda : self.principala.onundo()
+		self.principala.bID[0].on_release = lambda: self.principala.lici(0)
+		self.principala.bID[1].on_release = lambda: self.principala.lici(1)
+		self.principala.bID[2].on_release = lambda: self.principala.lici(2)
+		self.principala.bID[3].on_release = lambda: self.principala.lici(3)
+		self.principala.bID[4].on_release = lambda: self.principala.lici(4)
+		self.principala.bID[5].on_release = lambda: self.principala.lici(5)
+		self.principala.bID[6].on_release = lambda: self.principala.lici(6)
+		self.principala.bID[7].on_release = lambda: self.principala.lici(7)
+		self.principala.bID[8].on_release = lambda: self.principala.lici(8)
+		self.principala.ids._undo_.on_release = lambda : self.principala.onundo()
 
 
 ScreenManagerApp().run()
