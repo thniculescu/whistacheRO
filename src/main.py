@@ -251,12 +251,15 @@ class Pagina(PageLayout):
 			else:
 				self.playerup.text = self.playerNames[(tcur % self.numPlayer + (tcur / (2 * self.numPlayer))) % self.numPlayer] + ' made'
 
-	def update(self):
+	def update(self, joc):
 		global scor, streak, cscor, cstreak, ctotolit, totolit, licitate, clicitate, ctcur, tcur, totomade
 		for i in range(self.numPlayer):
 			self.sID[i].text = str(scor[i])
+			if(joc == 1):
+				streak[i] = 0;
 			self.trkID[i].text = str(streak[i])
-		
+			
+	
 	def savestate(self):
 		global scor, streak, cscor, cstreak, ctotolit, totolit, licitate, clicitate, ctcur, tcur, totomade
 		for i in range(self.numPlayer):
@@ -266,7 +269,7 @@ class Pagina(PageLayout):
 		ctcur = tcur
 		ctotolit = totolit
 		ctotomade = totomade
-
+	
 	def onundo(self):
 		global scor, streak, cscor, cstreak, ctotolit, totolit, licitate, clicitate, ctcur, tcur, totomade
 		for i in range(self.numPlayer):
@@ -275,19 +278,22 @@ class Pagina(PageLayout):
 			licitate[i] = clicitate[i]
 		#print 'tcur = %s ctcur = %s' % (tcur, ctcur)
 		tcur = ctcur
-		
+		for i in range(9):
+			self.bID[i].background_color = grey
+			self.bID[i].color = (1, 1, 1, 1)
 		totolit = ctotolit
 		totomade = ctotomade
-		#print 'UNDO BA'
-		self.update()
+		print 'UNDO BA'
+		self.update(0)
 		self.schimbaAfis()
-			
+		
 	def lici(self, nrb):
 		global licitate, scor, streak, totolit, tcur, totomade, gameof, grey
 		curpl = (tcur % self.numPlayer + (tcur / (2 * self.numPlayer))) % self.numPlayer
 		rund = tcur % (self.numPlayer * 2)
 		joc = int(gameof[tcur / (self.numPlayer * 2)][0])
-		self.savestate()
+		if(rund == 0):
+			self.savestate()
 		if rund < self.numPlayer:
 			totomade = 0
 			joc = int(gameof[tcur / (self.numPlayer * 2)][0])
@@ -333,11 +339,10 @@ class Pagina(PageLayout):
 					self.bID[joc - totomade].background_color = (0, 255, 0, 255)
 					self.bID[joc - totomade].color = (0, 0, 0, 1)
 			
-			
-			
-		self.update()
+		self.update(joc)
 		tcur += 1
 		self.schimbaAfis()
+		
 		
 	def scotpopup(self, pp, bb, tt):
 		global gameof
